@@ -5,6 +5,7 @@ A web app for creating and managing tier lists, built with Go and SQLite.
 ## Build & Run
 
 ```bash
+sqlc generate
 go run .
 ```
 
