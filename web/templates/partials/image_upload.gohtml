@@ -36,10 +36,10 @@
      x-sort:group="tier-images"
      {{end}}
   >
-  {{range .Images}}
+  {{range .Images.Items}}
     {{template "image" (dict "Image" . "Draggable" $.Draggable)}}
   {{end}}
 </div>
 
-<!-- Pagination {% include("partials/pagination.html") %} -->
+{{template "pagination" .Images}}
 {{end}}

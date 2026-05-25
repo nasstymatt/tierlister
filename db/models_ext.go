@@ -56,18 +56,26 @@ func GetTiersWithImages(ctx context.Context, q sqlc.Queries, tierlistID int64) (
 	return result, nil
 }
 
-func GetImages(ctx context.Context, q sqlc.Queries) ([]ImageView, error) {
-	images, err := q.ListImages(ctx)
+func GetImages(ctx context.Context, q sqlc.Queries, limit int, offset int) (result []ImageView, total int, err error) {
+	images, err := q.ListImages(ctx, sqlc.ListImagesParams{
+		Limit:  int64(limit),
+		Offset: int64(offset),
+	})
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	result := make([]ImageView, 0, len(images))
+	result = make([]ImageView, 0, len(images))
 	for _, image := range images {
-		result = append(result, ImageToImageView(image))
+		total = int(image.TotalCount)
+		result = append(result, ImageToImageView(sqlc.Image{
+			ID:               image.ID,
+			ImagePath:        image.ImagePath,
+			OriginalFilename: image.OriginalFilename,
+		}))
 	}
 
-	return result, nil
+	return
 }
 
 func ImageToImageView(image sqlc.Image) ImageView {
@@ -88,7 +96,6 @@ func MoveImage(ctx context.Context, q sqlc.Queries, tierlistID, tierID, imageID 
 		return err
 	}
 
-	// Build ordered list of IDs in the target tier, excluding the image being moved.
 	ids := make([]int64, 0, len(rows)+1)
 	for _, row := range rows {
 		if row.ImageID != imageID {
@@ -96,15 +103,12 @@ func MoveImage(ctx context.Context, q sqlc.Queries, tierlistID, tierID, imageID 
 		}
 	}
 
-	// Clamp 0-indexed position (Alpine Sort passes newIndex, starting at 0).
 	idx := min(max(0, position), len(ids))
 
-	// Insert the moved image at the target index.
 	ids = append(ids, 0)
 	copy(ids[idx+1:], ids[idx:])
 	ids[idx] = imageID
 
-	// UPSERT the moved image (handles both new placement and tier change).
 	if err := q.UpsertTierImage(ctx, sqlc.UpsertTierImageParams{
 		TierlistID: tierlistID,
 		TierID:     tierID,
@@ -114,7 +118,6 @@ func MoveImage(ctx context.Context, q sqlc.Queries, tierlistID, tierID, imageID 
 		return err
 	}
 
-	// Renumber all other images in the tier to clean float64 positions.
 	for i, id := range ids {
 		if id == imageID {
 			continue
@@ -131,16 +134,25 @@ func MoveImage(ctx context.Context, q sqlc.Queries, tierlistID, tierID, imageID 
 	return nil
 }
 
-func GetAvailableTierlistImages(ctx context.Context, q sqlc.Queries, tierlistID int64) ([]ImageView, error) {
-	images, err := q.GetAvailableTierlistImages(ctx, tierlistID)
+func GetAvailableTierlistImages(ctx context.Context, q sqlc.Queries, tierlistID int64, limit int, offset int) (result []ImageView, total int, err error) {
+	images, err := q.GetAvailableTierlistImages(ctx, sqlc.GetAvailableTierlistImagesParams{
+		TierlistID: tierlistID,
+		Limit:      int64(limit),
+		Offset:     int64(offset),
+	})
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	result := make([]ImageView, 0, len(images))
+	result = make([]ImageView, 0, len(images))
 	for _, image := range images {
-		result = append(result, ImageToImageView(image))
+		total = int(image.TotalCount)
+		result = append(result, ImageToImageView(sqlc.Image{
+			ID:               image.ID,
+			ImagePath:        image.ImagePath,
+			OriginalFilename: image.OriginalFilename,
+		}))
 	}
 
-	return result, nil
+	return
 }

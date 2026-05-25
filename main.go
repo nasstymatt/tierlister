@@ -34,6 +34,7 @@ var baseTemplates = []string{
 	"web/templates/partials/tierlist_edit_fieldset.gohtml",
 	"web/templates/partials/image.gohtml",
 	"web/templates/partials/image_upload.gohtml",
+	"web/templates/partials/pagination.gohtml",
 }
 var pages = []string{"index", "tierlist_create", "tierlist_edit", "images"}
 var funcMap = template.FuncMap{
@@ -50,6 +51,15 @@ var funcMap = template.FuncMap{
 			m[key] = pairs[i+1]
 		}
 		return m, nil
+	},
+	"add": func(a, b int) int { return a + b },
+	"sub": func(a, b int) int { return a - b },
+	"pageRange": func(from, to int) []int {
+		pages := make([]int, to-from+1)
+		for i := range pages {
+			pages[i] = from + i
+		}
+		return pages
 	},
 }
 
@@ -72,7 +82,7 @@ type TierlistEditPage struct {
 	TierlistEditForm
 	Tierlist sqlc.Tierlist
 	Tiers    []db.TierWithImages
-	Images   []db.ImageView
+	Images   db.Page[db.ImageView]
 }
 
 func (f *TierlistEditForm) Validate() bool {
@@ -169,12 +179,13 @@ func main() {
 			return
 		}
 
-		images, err := db.GetAvailableTierlistImages(r.Context(), *queries, id)
+		page, perPage, offset := db.PaginationParams(r)
+		images, total, err := db.GetAvailableTierlistImages(r.Context(), *queries, id, perPage, offset)
 		tmpl(w, "tierlist_edit", TierlistEditPage{
 			TierlistEditForm: TierlistEditForm{Title: tierlist.Title},
 			Tierlist:         tierlist,
 			Tiers:            tiers,
-			Images:           images,
+			Images:           db.Paginate(images, page, perPage, total),
 		})
 	})
 
@@ -273,13 +284,14 @@ func main() {
 	})
 
 	mux.HandleFunc("GET /images", func(w http.ResponseWriter, r *http.Request) {
-		images, err := db.GetImages(r.Context(), *queries)
+		page, perPage, offset := db.PaginationParams(r)
+		images, total, err := db.GetImages(r.Context(), *queries, perPage, offset)
 		if err != nil {
 			slog.Error("unable to load images", "err", err)
 			http.Error(w, "unable to load images", http.StatusInternalServerError)
 			return
 		}
-		tmpl(w, "images", images)
+		tmpl(w, "images", db.Paginate(images, page, perPage, total))
 	})
 
 	mux.HandleFunc("POST /images", func(w http.ResponseWriter, r *http.Request) {

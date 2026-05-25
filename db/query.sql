@@ -33,19 +33,24 @@ WHERE ti.tierlist_id = ?
 ORDER BY ti.position ASC;
 
 -- name: ListImages :many
-SELECT * FROM images ORDER BY created_at DESC;
+SELECT *, COUNT(*) OVER() AS total_count
+FROM images
+ORDER BY created_at DESC
+LIMIT ? OFFSET ?;
 
 -- name: CreateImage :one
 INSERT INTO images(image_path, original_filename) VALUES(?, ?)
 RETURNING *;
 
 -- name: GetAvailableTierlistImages :many
-SELECT * FROM images i
+SELECT *, COUNT(*) OVER() AS total_count
+FROM images i
 WHERE NOT EXISTS (
     SELECT 1 FROM tier_images ti
     WHERE ti.image_id = i.id AND ti.tierlist_id = ?
 )
-ORDER BY created_at DESC;
+ORDER BY created_at DESC
+LIMIT ? OFFSET ?;
 
 -- name: UpsertTierImage :exec
 INSERT INTO tier_images (tierlist_id, tier_id, image_id, position)
