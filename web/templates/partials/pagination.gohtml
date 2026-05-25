@@ -1,0 +1,56 @@
+{{- /*
+  Partial: pagination
+  Expects: Page[T] (any paginated response)
+  Fields used:
+    .Page        int  — current page (1-based)
+    .TotalPages  int  — total number of pages
+    .HasPrev     bool
+    .HasNext     bool
+*/ -}}
+
+{{define "pagination"}}
+{{- if gt .TotalPages 1 -}}
+<nav aria-label="Pagination">
+  <ul role="list">
+
+    {{- /* Prev */ -}}
+    <li>
+      {{if .HasPrev}}
+        <a href="?page={{sub .Page 1}}" rel="prev" aria-label="Previous page">
+          &laquo; Prev
+        </a>
+      {{else}}
+        <span aria-disabled="true" aria-label="No previous page">&laquo; Prev</span>
+      {{end}}
+    </li>
+
+    {{- /* Page numbers */ -}}
+    {{range $i := pageRange 1 .TotalPages}}
+      <li>
+        {{if eq $i $.Page}}
+          <span aria-current="page">{{$i}}</span>
+        {{else}}
+          <a href="?page={{$i}}" aria-label="Page {{$i}}">{{$i}}</a>
+        {{end}}
+      </li>
+    {{end}}
+
+    {{- /* Next */ -}}
+    <li>
+      {{if .HasNext}}
+        <a href="?page={{add .Page 1}}" rel="next" aria-label="Next page">
+          Next &raquo;
+        </a>
+      {{else}}
+        <span aria-disabled="true" aria-label="No next page">Next &raquo;</span>
+      {{end}}
+    </li>
+
+  </ul>
+
+  <p>
+    <small>Page {{.Page}} of {{.TotalPages}}</small>
+  </p>
+</nav>
+{{- end -}}
+{{end}}
