@@ -1,0 +1,17 @@
+{{define "image"}}
+<figure class="tier__figure"
+        {{if .Draggable}}
+        x-sort:item="{{.Image.ID}}"
+        {{end}}
+>
+  {{/* NOTE: Without decoding="sync" ghost element is always transparent on first drag */}}
+  <img
+    class="tier__image"
+    src="{{.Image.ImageURL}}"
+    alt="{{.Image.ImageName}}"
+    loading="lazy"
+    decoding="sync"
+    draggable="false"
+  />
+</figure>
+{{end}}

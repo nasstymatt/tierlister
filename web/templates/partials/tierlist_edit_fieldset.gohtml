@@ -1,0 +1,20 @@
+{{define "tierlist_edit_fieldset"}}
+<fieldset>
+  <label>
+    Title
+    <input
+      name="title"
+      placeholder="My Tierlist"
+      {{if .ErrTitle}}
+        aria-invalid="true"
+        aria-describedby="err_title"
+      {{end}}
+      value="{{.Title}}"
+      required
+    />
+    {{if .ErrTitle}}
+      <small id="err_title">{{.ErrTitle}}</small>
+    {{end}}
+  </label>
+</fieldset>
+{{end}}

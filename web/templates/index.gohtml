@@ -1,0 +1,33 @@
+{{define "body"}}
+<h1>My Tierlists</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th scope="col">Title</th>
+      <th scope="col">Created</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {{range .Tierlists}}
+    <tr id="tierlist-{{.ID}}">
+      <th scope="row">
+        <a href="/tierlists/{{.ID}}">{{.Title}}</a>
+      </th>
+      <td>{{.CreatedAt}}</td>
+      <td>
+        <button hx-delete="/tierlists/{{.ID}}"
+            hx-target="#tierlist-{{.ID}}"
+            hx-swap="delete"
+            hx-confirm="Delete tierlist {{.Title}}?"
+          >
+          Delete
+        </button>
+      </td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+{{end}}

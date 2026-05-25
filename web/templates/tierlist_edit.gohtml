@@ -1,0 +1,60 @@
+{{define "body"}}
+<header>
+  <h1>{{.Tierlist.Title}}</h1>
+  <p>{{.Tierlist.CreatedAt}}</p>
+</header>
+
+<section>
+  <h2 id="edit-tierlist-form-title">Edit tierlist</h2>
+  <form aria-labelledby="edit-tierlist-form-title" hx-put>
+    {{template "tierlist_edit_fieldset" .}}
+    <input type="submit" value="Save" />
+    <button type="button" class="danger" style="width:100%;" hx-delete hx-confirm="Delete tierlist {{.Tierlist.Title}}?">
+      Delete
+    </button>
+  </form>
+</section>
+
+<section>
+  <h2>Tiers</h2>
+  <div id="tiers" x-data>
+    {{range .Tiers}}
+      <div class="tier">
+        <div class="label" style="--pico-background-color:{{ .Color }};">
+          <span>{{ .Title }}</span>
+        </div>
+        <div class="images"
+             x-sort="tierImagesSort('{{ $.Tierlist.ID }}', '{{ .ID }}', $item, $position)"
+             x-sort:group="tier-images"
+        >
+          {{range .Images}}
+            {{template "image" (dict "Image" . "Draggable" true)}}
+          {{end}}
+        </div>
+      </div>
+    {{end}}
+  </div>
+</section>
+
+<section>
+  <h2>Upload image</h2>
+  {{template "image_upload" (dict "Images" .Images "Draggable" true "TierlistID" .Tierlist.ID)}}
+</section>
+{{end}}
+
+{{define "scripts"}}
+<script type="text/javascript">
+  function tierImagesSort(tierlist_id, tier_id, image_id, position) {
+    htmx.ajax('PUT', `/tierlists/${tierlist_id}/images/${image_id}`, {
+      values: { tier_id, position },
+      swap: 'none',
+    });
+  }
+
+  function tierImagesSortDelete(tierlist_id, image_id) {
+    htmx.ajax('DELETE', `/tierlists/${tierlist_id}/images/${image_id}`, {
+      swap: 'none',
+    });
+  }
+</script>
+{{end}}

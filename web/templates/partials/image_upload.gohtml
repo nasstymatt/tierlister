@@ -1,0 +1,45 @@
+{{define "image_upload"}}
+<form hx-encoding="multipart/form-data"
+      hx-post="/images"
+      hx-target="#images-list"
+      hx-swap="afterbegin"
+      x-data="{ processing: false }"
+      @htmx:before-request="processing=true"
+      @htmx:after-request="processing=false;$el.reset();"
+>
+  <fieldset :disabled="processing">
+    <label>
+      Upload Image
+      <input type="file"
+             name="image"
+             accept="image/png, image/jpeg"
+             required
+             />
+    </label>
+  </fieldset>
+
+  <button type="submit"
+          x-text="processing ? 'Uploading...' : 'Upload'"
+          :aria-busy="processing"
+          >
+    Upload
+  </button>
+</form>
+
+<div id="images-list"
+     class="grid"
+     x-data
+     {{if .Draggable}}
+     @htmx:after-swap="Alpine.initTree($el)"
+     x-ref="images_list"
+     x-sort="tierImagesSortDelete('{{.TierlistID}}', $item, $position)"
+     x-sort:group="tier-images"
+     {{end}}
+  >
+  {{range .Images}}
+    {{template "image" (dict "Image" . "Draggable" $.Draggable)}}
+  {{end}}
+</div>
+
+<!-- Pagination {% include("partials/pagination.html") %} -->
+{{end}}

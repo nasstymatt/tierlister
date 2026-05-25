@@ -1,0 +1,94 @@
+:root {
+  --color-danger: var(--pico-color-red-550);
+  --color-danger-hover: var(--pico-color-red-500);
+  --color-danger-focus: var(--pico-color-red-700);
+
+  --tier-image-width: 120px;
+}
+
+:is(button, [role="button"], input[type="submit"]).danger {
+  --pico-primary-background: var(--color-danger);
+  --pico-primary-border: var(--color-danger);
+
+  --pico-primary-hover-background: var(--color-danger-hover);
+  --pico-primary-hover-border: var(--color-danger-hover);
+
+  --pico-primary-focus: var(--color-danger-focus);
+
+  --pico-primary-inverse: #fff;
+}
+
+#images-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 2rem;
+
+    figure {
+        position: relative;
+    }
+
+    img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+    }
+}
+
+#tiers {
+    --pico-background-color: var(--pico-form-element-background-color);
+    --pico-border-color: var(--pico-form-element-border-color);
+    display: flex;
+    flex-direction: column;
+    border: var(--pico-border-width) solid var(--pico-border-color);
+    border-radius: var(--pico-border-radius);
+    background-color: var(--pico-background-color);
+
+    .tier {
+        display: flex;
+        min-height: 120px;
+        height: auto;
+        /* align-items: flex-start; */
+
+        &:not(:last-child) {
+            border-bottom: var(--pico-border-width) solid var(--pico-border-color);
+        }
+
+        .label {
+            display: flex;
+            width: var(--tier-image-width);
+            flex-shrink: 0;
+            height: auto;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--pico-background-color);
+            color: oklch(from var(--pico-background-color) calc((0.7 - l) * 1000) 0 0);
+            /* align-self: stretch; */
+        }
+
+        .images {
+            display: flex;
+            flex: 1;
+            flex-wrap: wrap;
+            height: auto;
+        } 
+    }
+}
+
+.tier__image {
+    height: var(--tier-image-width);
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    gap: 1rem;
+
+    a.current {
+        --pico-color: var(--pico-primary-hover);
+        --pico-underline: var(--pico-primary-hover-underline);
+    }
+}

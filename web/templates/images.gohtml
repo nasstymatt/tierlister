@@ -1,0 +1,10 @@
+{{define "body"}}
+<main class="container">
+  <h1>Images</h1>
+
+  <section>
+    <h2>Upload</h2>
+    {{template "image_upload" (dict "Images" . "Draggable" false)}}
+  </section>
+</main>
+{{end}}

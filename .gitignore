@@ -1,0 +1,8 @@
+.DS_Store
+.idea
+*.log
+tmp/
+
+tierlister
+data/**/*
+db/*.sql.go

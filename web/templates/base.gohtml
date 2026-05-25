@@ -1,0 +1,27 @@
+{{define "base"}}
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Tierlister</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css"/>
+    <link rel="stylesheet" href="/assets/styles.css"/>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/sort@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+  </head>
+  <body>
+    {{template "nav" .}}
+    <main class="container">
+      {{block "body" .}}{{end}}
+    </main>
+    <footer class="container">
+      <small>Tierlister &copy; 2026</small>
+    </footer>
+    {{block "scripts" .}}{{end}}
+  </body>
+</html>
+{{end}}
